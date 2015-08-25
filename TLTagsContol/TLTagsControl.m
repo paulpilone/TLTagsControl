@@ -80,13 +80,22 @@
     tagInputField_.layer.borderColor = [UIColor lightGrayColor].CGColor;
     tagInputField_.backgroundColor = [UIColor whiteColor];
     tagInputField_.delegate = self;
-    tagInputField_.font = [UIFont fontWithName:@"HelveticaNeue" size:14];
+    tagInputField_.font = [UIFont fontWithName:@"HelveticaNeue" size:17.f];
     tagInputField_.placeholder = @"tag";
     tagInputField_.autocorrectionType = UITextAutocorrectionTypeNo;
     
     if (_mode == TLTagsControlModeEdit) {
         [self addSubview:tagInputField_];
     }
+}
+
+- (void)setTagsPlaceholderFont:(UIFont *)tagsPlaceholderFont {
+    tagInputField_.font = tagsPlaceholderFont;
+    [self setNeedsDisplay];
+}
+
+- (UIFont *)tagsPlaceholderFont {
+    return tagInputField_.font;
 }
 
 #pragma mark - layout stuff
@@ -290,7 +299,14 @@
     [view removeFromSuperview];
     
     NSInteger index = [tagSubviews_ indexOfObject:view];
+    NSString *tag = _tags[index];
+
     [_tags removeObjectAtIndex:index];
+    
+    if ([self.tapDelegate respondsToSelector:@selector(tagsControl:didRemoveTag:)]) {
+        [self.tapDelegate tagsControl:self didRemoveTag:tag];
+    }
+    
     [self reloadTagSubviews];
 }
 

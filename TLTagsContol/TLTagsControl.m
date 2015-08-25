@@ -10,6 +10,8 @@
 
 @interface TLTagsControl () <UITextFieldDelegate, UIGestureRecognizerDelegate>
 
+- (void)notifyDelegateOfTagAdd:(NSString *)tag;
+
 @end
 
 @implementation TLTagsControl {
@@ -306,6 +308,7 @@
         NSString *tag = textField.text;
         textField.text = @"";
         [self addTag:tag];
+        [self notifyDelegateOfTagAdd:tag];
     }
     
     return YES;
@@ -336,6 +339,7 @@
             for (NSString *component in components) {
                 if (component.length > 0 && [component rangeOfCharacterFromSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]].location == NSNotFound) {
                     [self addTag:component];
+                    [self notifyDelegateOfTagAdd:component];
                     break;
                 }
             }
@@ -348,6 +352,10 @@
 }
 
 #pragma mark - other
+
+- (void)notifyDelegateOfTagAdd:(NSString *)tag {
+    [self.tapDelegate tagsControl:self didAddTag:tag];
+}
 
 - (void)setMode:(TLTagsControlMode)mode {
     _mode = mode;
